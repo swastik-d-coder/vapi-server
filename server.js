@@ -5,7 +5,7 @@ const app = express();
 app.use(express.json());
 
 // 🔑 Twilio config
-const client = twilio("AC8b990f601dbc2734c5ddb62f75beecb4", "69ef4e6602a67a5f1e92e735dc55917f");
+const client = twilio("AC8b990f601dbc2734c5ddb62f75beecb4", "0efe167a02edff69361908aa4de4e568");
 
 // ✅ test route
 app.get("/", (req, res) => {
