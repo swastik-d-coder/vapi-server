@@ -18,7 +18,7 @@ app.post("/vapi-webhook", async (req, res) => {
 
   console.log("📩 Event:", event);
 
-  if (event.type === "call.ended") {
+  if (event.type) {
 
     const data = event.customer || {};
 
