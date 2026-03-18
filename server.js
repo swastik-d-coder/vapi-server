@@ -18,23 +18,35 @@ app.post("/vapi-webhook", async (req, res) => {
 
   console.log("📩 Event:", event);
 
-  // ✅ sirf call end pe trigger
-  if (event.type === "call.ended") {
+  // ✅ correct event
+  if (event.message?.type === "end-of-call-report") {
 
-    const data = event.customer || {};
+    const artifact = event.message.artifact;
+
+    // 🔥 transcript se data nikaal (basic extraction)
+    const transcript = artifact.transcript || "";
+
+    let name = "N/A";
+    let phone = "N/A";
+
+    // simple extraction (basic)
+    const nameMatch = transcript.match(/User: (.+)\./);
+    if (nameMatch) name = nameMatch[1];
+
+    const phoneMatch = transcript.match(/(\d{10})/);
+    if (phoneMatch) phone = phoneMatch[1];
 
     const message = `
 📞 New Admission Lead
 
-👤 Name: ${data.name || "N/A"}
-📱 Phone: ${data.phone || "N/A"}
-📧 Email: ${data.email || "N/A"}
+👤 Name: ${name}
+📱 Phone: ${phone}
 `;
 
     try {
       await client.messages.create({
         from: "whatsapp:+14155238886",
-        to: "whatsapp:+919149775991",
+        to: "whatsapp:+91XXXXXXXXXX",
         body: message
       });
 
