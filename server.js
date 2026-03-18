@@ -27,26 +27,34 @@ app.post("/vapi-webhook", async (req, res) => {
 let name = "N/A";
 let phone = "N/A";
 
-// 🔥 NAME (2nd user response pick karega)
-const nameMatches = transcript.match(/User: (.+)/g);
-if (nameMatches && nameMatches.length >= 2) {
-  name = nameMatches[1].replace("User: ", "").trim();
+const messages = artifact.messages || [];
+
+// 🔥 user ke saare responses nikaal
+const userMessages = messages
+  .filter(m => m.role === "user")
+  .map(m => m.content?.toLowerCase() || "");
+
+// 👉 DEBUG
+console.log("🧠 USER MSGS:", userMessages);
+
+// 🔥 NAME = 1st meaningful response
+if (userMessages.length >= 2) {
+  name = userMessages[1].trim();
 }
 
-// 🔥 PHONE (words → digits)
+// 🔥 PHONE detect
 const wordToDigit = {
   zero: "0", one: "1", two: "2", three: "3", four: "4",
   five: "5", six: "6", seven: "7", eight: "8", nine: "9"
 };
 
-const phoneLine = transcript.match(/User: ([a-z\s]+)\.\nAI: Thank you for providing the phone number/i);
-
-if (phoneLine) {
-  const words = phoneLine[1].toLowerCase().split(" ");
+for (let msg of userMessages) {
+  const words = msg.split(" ");
   const digits = words.map(w => wordToDigit[w] || "").join("");
 
   if (digits.length >= 10) {
     phone = digits.slice(0, 10);
+    break;
   }
 }
 
