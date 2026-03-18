@@ -55,8 +55,8 @@ if (phoneLine) {
 
 console.log("🧠 VARIABLES:", vars); // debug ke liye
 
-const name = vars.name || vars.student_name || "N/A";
-const phone = vars.phone || vars.phone_number || "N/A";
+name = vars.name || vars.student_name || "N/A";
+phone = vars.phone || vars.phone_number || "N/A";
 const email = vars.email || "N/A";
 
     const message = `
