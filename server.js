@@ -42,7 +42,7 @@ app.post("/vapi-webhook", async (req, res) => {
 👤 Name: ${name}
 📱 Phone: ${phone}
 `;
-
+console.log("👉 Sending WhatsApp...");
     try {
       await client.messages.create({
         from: "whatsapp:+14155238886",
