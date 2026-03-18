@@ -24,17 +24,13 @@ app.post("/vapi-webhook", async (req, res) => {
     const artifact = event.message.artifact;
 
     // 🔥 transcript se data nikaal (basic extraction)
-    const transcript = artifact.transcript || "";
+    const vars = artifact.variableValues || {};
 
-    let name = "N/A";
-    let phone = "N/A";
+console.log("🧠 VARIABLES:", vars); // debug ke liye
 
-    // simple extraction (basic)
-    const nameMatch = transcript.match(/User: (.+)\./);
-    if (nameMatch) name = nameMatch[1];
-
-    const phoneMatch = transcript.match(/(\d{10})/);
-    if (phoneMatch) phone = phoneMatch[1];
+const name = vars.name || vars.student_name || "N/A";
+const phone = vars.phone || vars.phone_number || "N/A";
+const email = vars.email || "N/A";
 
     const message = `
 📞 New Admission Lead
