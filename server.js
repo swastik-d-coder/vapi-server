@@ -27,19 +27,19 @@ app.post("/vapi-webhook", async (req, res) => {
 let name = "N/A";
 let phone = "N/A";
 
-// 🔥 NAME extraction
-const nameMatch = transcript.match(/User: ([A-Za-z\s]+)/);
-if (nameMatch) {
-  name = nameMatch[1].trim();
+// 🔥 NAME (2nd user response pick karega)
+const nameMatches = transcript.match(/User: (.+)/g);
+if (nameMatches && nameMatches.length >= 2) {
+  name = nameMatches[1].replace("User: ", "").trim();
 }
 
-// 🔥 PHONE extraction (words → number)
+// 🔥 PHONE (words → digits)
 const wordToDigit = {
   zero: "0", one: "1", two: "2", three: "3", four: "4",
   five: "5", six: "6", seven: "7", eight: "8", nine: "9"
 };
 
-const phoneLine = transcript.match(/User: ([a-z\s]+)\nAI: Thank you for providing the phone number/i);
+const phoneLine = transcript.match(/User: ([a-z\s]+)\.\nAI: Thank you for providing the phone number/i);
 
 if (phoneLine) {
   const words = phoneLine[1].toLowerCase().split(" ");
