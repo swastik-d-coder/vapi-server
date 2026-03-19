@@ -15,32 +15,38 @@ app.get("/", (req, res) => {
 app.post("/vapi-webhook", async (req, res) => {
   const event = req.body;
 
-  console.log("📩 Event:", event);
+  console.log("📩 Event received");
 
-  // ✅ sirf call end pe trigger
-  if (event.type === "call.ended") {
+  try {
+    // ✅ safe access
+    const artifact = event?.message?.artifact;
 
-    const data = event.customer || {};
+    if (!artifact) {
+      console.log("❌ No artifact मिला");
+      return res.sendStatus(200);
+    }
+
+    // ✅ safe transcript
+    const transcript = artifact?.transcript || "No transcript";
 
     const message = `
-📞 New Admission Lead
+📞 RAW DATA
 
-👤 Name: ${data.name || "N/A"}
-📱 Phone: ${data.phone || "N/A"}
-📧 Email: ${data.email || "N/A"}
+${transcript}
 `;
 
-    try {
-      await client.messages.create({
-        from: "whatsapp:+14155238886",
-        to: "whatsapp:+919149775991",
-        body: message
-      });
+    console.log("👉 Sending WhatsApp...");
 
-      console.log("✅ WhatsApp sent!");
-    } catch (err) {
-      console.log("❌ WhatsApp error:", err.message);
-    }
+    await client.messages.create({
+      from: "whatsapp:+14155238886",
+      to: "whatsapp:+91XXXXXXXXXX",
+      body: message
+    });
+
+    console.log("✅ WhatsApp sent!");
+
+  } catch (err) {
+    console.log("❌ ERROR:", err.message);
   }
 
   res.sendStatus(200);
