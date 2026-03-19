@@ -1,59 +1,67 @@
 const express = require("express");
-const twilio = require("twilio");
+const nodemailer = require("nodemailer");
+const bodyParser = require("body-parser");
+const cors = require("cors");
 
 const app = express();
-app.use(express.json());
 
-// 🔑 Twilio config
-const client = twilio(process.env.ACCOUNT_SID, process.env.AUTH_TOKEN)
-// ✅ test route
-app.get("/", (req, res) => {
-  res.send("Server working ✅");
+app.use(cors());
+app.use(bodyParser.json());
+
+// 🔐 Gmail setup
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: "swastikkr122010@gmail.com",
+    pass: "vbxf xkrk dvqo kplr
+"
+  }
 });
 
-// 🔥 FINAL webhook
-app.post("/vapi-webhook", async (req, res) => {
-  const event = req.body;
+// 🧠 Function to extract details from message
+function extractDetails(text) {
+  const nameMatch = text.match(/name is ([a-zA-Z ]+)/i);
+  const phoneMatch = text.match(/(\d{10})/);
+  const emailMatch = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-z]{2,}/);
 
-  console.log("📩 Event received");
+  return {
+    name: nameMatch ? nameMatch[1] : null,
+    phone: phoneMatch ? phoneMatch[0] : null,
+    email: emailMatch ? emailMatch[0] : null
+  };
+}
 
-  try {
-    // ✅ safe access
-    const artifact = event?.message?.artifact;
+// 🤖 AI Chat route
+app.post("/chat", async (req, res) => {
+  const userMessage = req.body.message;
 
-    if (!artifact) {
-      console.log("❌ No artifact मिला");
-      return res.sendStatus(200);
+  // 🤖 Simple AI reply (tu apna AI laga sakta hai)
+  const aiReply = "Thanks! If you shared your details, our team will contact you.";
+
+  // 🔍 Extract details
+  const { name, phone, email } = extractDetails(userMessage);
+
+  // 📧 Agar teeno mil gaye toh email bhej
+  if (name && phone && email) {
+    try {
+      await transporter.sendMail({
+        from: "swastikkr122010@gmail.com",
+        to: "laddukr122010@gmail.com",
+        subject: "New Lead from AI Chat",
+        text: `Name: ${name}\nPhone: ${phone}\nEmail: ${email}`
+      });
+
+      console.log("✅ Email sent with lead details");
+
+    } catch (error) {
+      console.log("❌ Email error:", error);
     }
-
-    // ✅ safe transcript
-    const transcript = artifact?.transcript || "No transcript";
-
-    const message = `
-📞 RAW DATA
-
-${transcript}
-`;
-
-    console.log("👉 Sending WhatsApp...");
-
-    await client.messages.create({
-      from: "whatsapp:+14155238886",
-      to: "whatsapp:+91XXXXXXXXXX",
-      body: message
-    });
-
-    console.log("✅ WhatsApp sent!");
-
-  } catch (err) {
-    console.log("❌ ERROR:", err.message);
   }
 
-  res.sendStatus(200);
+  res.json({ reply: aiReply });
 });
 
-// ✅ Render port
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log("Server running on port " + PORT);
+// 🚀 Start server
+app.listen(3000, () => {
+  console.log("Server running on http://localhost:3000");
 });
