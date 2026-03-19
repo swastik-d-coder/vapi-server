@@ -16,74 +16,38 @@ app.get("/", (req, res) => {
 app.post("/vapi-webhook", async (req, res) => {
   const event = req.body;
 
-  console.log("📩 Event:", event);
+  console.log("📩 Event received");
 
-  // ✅ correct event
-  if (event.message?.type === "end-of-call-report") {
+  try {
+    // ✅ safe access
+    const artifact = event?.message?.artifact;
 
-    const artifact = event.message.artifact;
-    const transcript = artifact.transcript || "";
+    if (!artifact) {
+      console.log("❌ No artifact मिला");
+      return res.sendStatus(200);
+    }
 
-let name = "N/A";
-let phone = "N/A";
-
-const messages = artifact.messages || [];
-
-// 🔥 user ke saare responses nikaal
-const userMessages = messages
-  .filter(m => m.role === "user")
-  .map(m => m.content?.toLowerCase() || "");
-
-// 👉 DEBUG
-console.log("🧠 USER MSGS:", userMessages);
-
-// 🔥 NAME = 1st meaningful response
-if (userMessages.length >= 2) {
-  name = userMessages[1].trim();
-}
-
-// 🔥 PHONE detect
-const wordToDigit = {
-  zero: "0", one: "1", two: "2", three: "3", four: "4",
-  five: "5", six: "6", seven: "7", eight: "8", nine: "9"
-};
-
-for (let msg of userMessages) {
-  const words = msg.split(" ");
-  const digits = words.map(w => wordToDigit[w] || "").join("");
-
-  if (digits.length >= 10) {
-    phone = digits.slice(0, 10);
-    break;
-  }
-}
-
-    // 🔥 transcript se data nikaal (basic extraction)
-    const vars = artifact.variableValues || {};
-
-console.log("🧠 VARIABLES:", vars); // debug ke liye
-
-name = vars.name || vars.student_name || "N/A";
-phone = vars.phone || vars.phone_number || "N/A";
-const email = vars.email || "N/A";
+    // ✅ safe transcript
+    const transcript = artifact?.transcript || "No transcript";
 
     const message = `
 📞 RAW DATA
 
-${artifact.transcript}
+${transcript}
 `;
-console.log("👉 Sending WhatsApp...");
-    try {
-      await client.messages.create({
-        from: "whatsapp:+14155238886",
-        to: "whatsapp:+919149775991",
-        body: message
-      });
 
-      console.log("✅ WhatsApp sent!");
-    } catch (err) {
-      console.log("❌ WhatsApp error:", err.message);
-    }
+    console.log("👉 Sending WhatsApp...");
+
+    await client.messages.create({
+      from: "whatsapp:+14155238886",
+      to: "whatsapp:+91XXXXXXXXXX",
+      body: message
+    });
+
+    console.log("✅ WhatsApp sent!");
+
+  } catch (err) {
+    console.log("❌ ERROR:", err.message);
   }
 
   res.sendStatus(200);
