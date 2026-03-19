@@ -13,6 +13,7 @@ app.get("/", (req, res) => {
 });
 
 // 🔥 FINAL webhook
+console.log("🔥 FULL EVENT:", JSON.stringify(req.body, null, 2));
 app.post("/vapi-webhook", async (req, res) => {
   const event = req.body;
 
@@ -22,7 +23,6 @@ app.post("/vapi-webhook", async (req, res) => {
   if (event.message?.type === "end-of-call-report") {
 
     const artifact = event.message.artifact;
-    console.log("🔥 FULL ARTIFACT:", JSON.stringify(artifact, null, 2));
     const transcript = artifact.transcript || "";
 
 let name = "N/A";
