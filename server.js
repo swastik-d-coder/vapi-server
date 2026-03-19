@@ -32,34 +32,12 @@ function extractDetails(text) {
 
 // 🤖 AI Chat route
 app.post("/chat", async (req, res) => {
-  console.log("🔥 Request aayi hai:", req.body);
-  
-  const userMessage = req.body.message;
+  app.post("/vapi", async (req, res) => {
+  console.log("🔥 VAPI HIT:", JSON.stringify(req.body, null, 2));
 
-  // 🤖 Simple AI reply (tu apna AI laga sakta hai)
-  const aiReply = "Thanks! If you shared your details, our team will contact you.";
-
-  // 🔍 Extract details
-  const { name, phone, email } = extractDetails(userMessage);
-
-  // 📧 Agar teeno mil gaye toh email bhej
-  if (name && phone && email) {
-    try {
-      await transporter.sendMail({
-        from: "swastikkr122010@gmail.com",
-        to: "laddukr122010@gmail.com",
-        subject: "New Lead from AI Chat",
-        text: `Name: ${name}\nPhone: ${phone}\nEmail: ${email}`
-      });
-
-      console.log("✅ Email sent with lead details");
-
-    } catch (error) {
-      console.log("❌ Email error:", error);
-    }
-  }
-
-  res.json({ reply: aiReply });
+  res.json({
+    response: "ok"
+  });
 });
 
 // 🚀 Start server
