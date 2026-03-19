@@ -13,7 +13,6 @@ app.get("/", (req, res) => {
 });
 
 // 🔥 FINAL webhook
-console.log("🔥 FULL EVENT:", JSON.stringify(req.body, null, 2));
 app.post("/vapi-webhook", async (req, res) => {
   const event = req.body;
 
@@ -69,10 +68,9 @@ phone = vars.phone || vars.phone_number || "N/A";
 const email = vars.email || "N/A";
 
     const message = `
-📞 New Admission Lead
+📞 RAW DATA
 
-👤 Name: ${name}
-📱 Phone: ${phone}
+${artifact.transcript}
 `;
 console.log("👉 Sending WhatsApp...");
     try {
