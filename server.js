@@ -34,44 +34,23 @@ function extractDetails(text) {
 app.post("/vapi", async (req, res) => {
   console.log("🔥 VAPI HIT:", JSON.stringify(req.body, null, 2));
 
-  // 🧠 Vapi message extract (may vary)
-  const userMessage =
-    req.body.message?.content ||
-    req.body.input ||
-    "";
+  // 🔥 TEST EMAIL (temporary)
+  try {
+    await transporter.sendMail({
+      from: "swastikkr122010@gmail.com",
+      to: "laddukr122010@gmail.com",
+      subject: "TEST EMAIL",
+      text: "Bhai email system working hai 🚀"
+    });
 
-  console.log("User Message:", userMessage);
+    console.log("✅ Email working");
 
-  // 🔍 Extract details
-  const phoneMatch = userMessage.match(/\d{10}/);
-  const emailMatch = userMessage.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-z]{2,}/);
-  const nameMatch = userMessage.match(/name is ([a-zA-Z ]+)/i);
-
-  const name = nameMatch ? nameMatch[1] : null;
-  const phone = phoneMatch ? phoneMatch[0] : null;
-  const email = emailMatch ? emailMatch[0] : null;
-
-  console.log("Extracted:", { name, phone, email });
-
-  // 📧 Send email if all found
-  if (name && phone && email) {
-    try {
-      await transporter.sendMail({
-        from: "YOUR_EMAIL@gmail.com",
-        to: "YOUR_EMAIL@gmail.com",
-        subject: "New Lead from Vapi AI",
-        text: `Name: ${name}\nPhone: ${phone}\nEmail: ${email}`
-      });
-
-      console.log("✅ Email sent successfully");
-
-    } catch (err) {
-      console.log("❌ Email error:", err);
-    }
+  } catch (error) {
+    console.log("❌ Email error:", error);
   }
 
   res.json({
-    response: "Thanks! Our team will contact you soon."
+    response: "ok"
   });
 });
 // 🚀 Start server
