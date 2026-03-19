@@ -5,8 +5,7 @@ const app = express();
 app.use(express.json());
 
 // 🔑 Twilio config
-const client = twilio("YOUR_ACCOUNT_SID", "YOUR_AUTH_TOKEN");
-
+const client = twilio(process.env.ACCOUNT_SID, process.env.AUTH_TOKEN)
 // ✅ test route
 app.get("/", (req, res) => {
   res.send("Server working ✅");
