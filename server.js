@@ -5,7 +5,7 @@ const app = express();
 app.use(express.json());
 
 // 🔑 Twilio config
-const client = twilio(process.env.ACCOUNT_SID, process.env.AUTH_TOKEN)
+const client = twilio("YOUR_ACCOUNT_SID", "YOUR_AUTH_TOKEN");
 
 // ✅ test route
 app.get("/", (req, res) => {
@@ -16,38 +16,32 @@ app.get("/", (req, res) => {
 app.post("/vapi-webhook", async (req, res) => {
   const event = req.body;
 
-  console.log("📩 Event received");
+  console.log("📩 Event:", event);
 
-  try {
-    // ✅ safe access
-    const artifact = event?.message?.artifact;
+  // ✅ sirf call end pe trigger
+  if (event.type === "call.ended") {
 
-    if (!artifact) {
-      console.log("❌ No artifact मिला");
-      return res.sendStatus(200);
-    }
-
-    // ✅ safe transcript
-    const transcript = artifact?.transcript || "No transcript";
+    const data = event.customer || {};
 
     const message = `
-📞 RAW DATA
+📞 New Admission Lead
 
-${transcript}
+👤 Name: ${data.name || "N/A"}
+📱 Phone: ${data.phone || "N/A"}
+📧 Email: ${data.email || "N/A"}
 `;
 
-    console.log("👉 Sending WhatsApp...");
+    try {
+      await client.messages.create({
+        from: "whatsapp:+14155238886",
+        to: "whatsapp:+919149775991",
+        body: message
+      });
 
-    await client.messages.create({
-      from: "whatsapp:+14155238886",
-      to: "whatsapp:+91XXXXXXXXXX",
-      body: message
-    });
-
-    console.log("✅ WhatsApp sent!");
-
-  } catch (err) {
-    console.log("❌ ERROR:", err.message);
+      console.log("✅ WhatsApp sent!");
+    } catch (err) {
+      console.log("❌ WhatsApp error:", err.message);
+    }
   }
 
   res.sendStatus(200);
