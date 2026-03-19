@@ -32,6 +32,8 @@ function extractDetails(text) {
 
 // 🤖 AI Chat route
 app.post("/chat", async (req, res) => {
+  console.log("🔥 Request aayi hai:", req.body);
+  
   const userMessage = req.body.message;
 
   // 🤖 Simple AI reply (tu apna AI laga sakta hai)
